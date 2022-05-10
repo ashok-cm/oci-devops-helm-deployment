@@ -1,4 +1,4 @@
-# oci-arch-devops (devops_oke)
+# oci-devops-helm-deployment (devops_oke)
 
 Rapid delivery of software is essential for efficiently running your applications in the cloud. Oracle DevOps service provides an end-to-end continuous deployment experience to developers. Oracle DevOps service includes deploying pipelines to automate your continuous software deployment process (CD) to Oracle Cloud Infrastructure (OCI) platforms: Container Engine for Kubernetes (OKE), Functions, and Compute instances.
 
@@ -57,6 +57,13 @@ tenancy_ocid         = "<tenancy_ocid>"
 user_ocid            = "<user_ocid>"
 fingerprint          = "<finger_print>"
 private_key_path     = "<pem_private_key_path>"
+compartment_ocid     = "<compartment_ocid>"
+oci_user_authtoken   = "<USER_AUTH_TOKEN>
+oci_username         = "<USERNAME>"
+
+# OKE Details
+create_new_oke_cluster = "<true/false>"
+existent_oke_cluster_id = "<Existing OKE Clsuter OCID>"
 
 # Region
 region = "<oci_region>"
@@ -81,6 +88,6 @@ When you no longer need the deployment, you can run this command to destroy the 
 
 ## Architecture Diagram
 
-![](./images/dev-ops-deployment-pipeline.png)
+![](./images/dev-ops-helm-deployment-pipeline.png)
 
 
