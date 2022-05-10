@@ -1,5 +1,5 @@
 resource "oci_logging_log_group" "test_log_group" {
-  compartment_id = var.compartment_id
+  compartment_id = var.compartment_ocid
   display_name   = "${local.app_name_normalized}_${random_string.deploy_id.result}_log_group"
   defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
@@ -22,7 +22,7 @@ resource "oci_logging_log" "test_log" {
     }
 
     #Optional
-    compartment_id = var.compartment_id
+    compartment_id = var.compartment_ocid
   }
 
   is_enabled         = true
@@ -31,13 +31,13 @@ resource "oci_logging_log" "test_log" {
 }
 
 resource "oci_ons_notification_topic" "test_notification_topic" {
-  compartment_id = var.compartment_id
+  compartment_id = var.compartment_ocid
   name           = "${local.app_name_normalized}_${random_string.deploy_id.result}_topic"
   defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_devops_project" "test_project" {
-  compartment_id = var.compartment_id
+  compartment_id = var.compartment_ocid
   # logging_config {
   #   log_group_id             = oci_logging_log_group.test_log_group.id
   #   retention_period_in_days = var.project_logging_config_retention_period_in_days
@@ -68,17 +68,18 @@ resource "oci_devops_deploy_environment" "test_environment" {
 
 #  Add var to choose between an existing Articat and an inline one
 
-# resource "oci_devops_deploy_artifact" "test_deploy_artifact" {
-#   argument_substitution_mode = var.argument_substitution_mode
-#   deploy_artifact_type       = var.deploy_artifact_type
-#   project_id                 = oci_devops_project.test_project.id
+resource "oci_devops_deploy_artifact" "test_deploy_values_yaml_artifact" {
+  argument_substitution_mode = var.argument_substitution_mode
+  deploy_artifact_type       = "GENERIC_FILE"
+  project_id                 = oci_devops_project.test_project.id
+  display_name               = "values.yaml"
 
-#   deploy_artifact_source {
-#     deploy_artifact_source_type = var.deploy_artifact_source_type #INLINE,GENERIC_ARTIFACT_OCIR
-#     base64encoded_content       = file("${path.module}/manifest/nginx.yaml")
-#   }
-#   defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
-# }
+  deploy_artifact_source {
+    deploy_artifact_source_type = var.deploy_artifact_source_type #INLINE,GENERIC_ARTIFACT_OCIR
+    base64encoded_content       = replace(file("${path.module}/manifest/values.yaml"), "<NODE_SERVICE_REPO>", "${local.ocir_docker_repository}/${local.ocir_namespace}/${oci_artifacts_container_repository.test_container_repository.display_name}")
+  }
+  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
+}
 
 resource "oci_devops_deploy_pipeline" "test_deploy_pipeline" {
   #Required
@@ -96,38 +97,35 @@ resource "oci_devops_deploy_pipeline" "test_deploy_pipeline" {
   defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
-resource "oci_devops_deploy_stage" "test_deploy_stage" {
+resource "oci_devops_deploy_artifact" "test_deploy_helm_artifact" {
+  project_id = oci_devops_project.test_project.id
+  display_name = "Helm Repo"
+  deploy_artifact_type = "HELM_CHART"
+  argument_substitution_mode = "NONE"
+  deploy_artifact_source {
+    deploy_artifact_source_type = "HELM_CHART"
+    chart_url = "oci://${local.ocir_docker_repository}/${local.ocir_namespace}/${oci_artifacts_container_repository.test_container_repository_helm.display_name}/${var.deploy_helm_chart_name}"
+    deploy_artifact_version = "0.1.0-$${BUILDRUN_HASH}"
+  }
+}
+
+resource "oci_devops_deploy_stage" "test_helm_deploy_stage" {
   #Required
   deploy_pipeline_id = oci_devops_deploy_pipeline.test_deploy_pipeline.id
   deploy_stage_predecessor_collection {
     #Required
     items {
-      #Required - firt statge has the predecessor ID as pipeline ID
+      #Required
       id = oci_devops_deploy_pipeline.test_deploy_pipeline.id
     }
   }
-  deploy_stage_type = var.deploy_stage_deploy_stage_type
-
 
   description  = var.deploy_stage_description
   display_name = var.deploy_stage_display_name
 
-  kubernetes_manifest_deploy_artifact_ids = [oci_devops_deploy_artifact.test_deploy_artifact.id]
-  namespace                               = var.deploy_stage_namespace
+  deploy_stage_type = var.deploy_stage_deploy_stage_type
+  release_name = var.deploy_stage_helm_release_name
+  values_artifact_ids = [oci_devops_deploy_artifact.test_deploy_values_yaml_artifact.id]
+  helm_chart_deploy_artifact_id = oci_devops_deploy_artifact.test_deploy_helm_artifact.id
   oke_cluster_deploy_environment_id       = oci_devops_deploy_environment.test_environment.id
-  defined_tags                            = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
-}
-
-# Invoke the deployment
-
-resource "oci_devops_deployment" "test_deployment" {
-  count      = var.execute_deployment ? 1 : 0
-  depends_on = [oci_devops_deploy_stage.test_deploy_stage]
-  #Required
-  deploy_pipeline_id = oci_devops_deploy_pipeline.test_deploy_pipeline.id
-  deployment_type    = "PIPELINE_DEPLOYMENT"
-
-  #Optional
-  display_name = "devopsdeployment"
-  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }

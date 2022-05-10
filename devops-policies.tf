@@ -6,7 +6,7 @@ resource "oci_identity_dynamic_group" "devops_pipln_dg" {
   name           = "${local.app_name_normalized}-devops-pipln-dg-${random_string.deploy_id.result}"
   description    = "${var.app_name} DevOps Pipeline Dynamic Group"
   compartment_id = var.tenancy_ocid
-  matching_rule  = "All {resource.type = 'devopsdeploypipeline', resource.compartment.id = '${var.compartment_id}'}"
+  matching_rule  = "All {resource.type = 'devopsdeploypipeline', resource.compartment.id = '${var.compartment_ocid}'}"
 
   provider = oci.home_region
 
@@ -15,7 +15,7 @@ resource "oci_identity_dynamic_group" "devops_pipln_dg" {
 resource "oci_identity_policy" "devops_compartment_policies" {
   name           = "${local.app_name_normalized}-devops-compartment-policies-${random_string.deploy_id.result}"
   description    = "${var.app_name} DevOps Compartment Policies"
-  compartment_id = var.compartment_id
+  compartment_id = var.compartment_ocid
   statements     = local.devops_compartment_statements
 
   depends_on = [oci_identity_dynamic_group.devops_pipln_dg]
@@ -37,7 +37,7 @@ locals {
   devops_pipln_dg = var.create_dynamic_group_for_devops_pipln_in_compartment ? oci_identity_dynamic_group.devops_pipln_dg.0.name : "void"
 
   allow_devops_manage_compartment_statements = [
-    "Allow dynamic-group ${local.devops_pipln_dg} to manage all-resources in compartment id ${var.compartment_id}",
+    "Allow dynamic-group ${local.devops_pipln_dg} to manage all-resources in compartment id ${var.compartment_ocid}",
   ]
 
 }

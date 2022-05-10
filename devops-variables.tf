@@ -49,7 +49,7 @@ variable "deploy_artifact_type" {
 }
 
 variable "argument_substitution_mode" {
-  default = "NONE"
+  default = "SUBSTITUTE_PLACEHOLDERS"
 }
 
 variable "create_dynamic_group_for_devops_pipln_in_compartment" {
@@ -65,7 +65,11 @@ variable "deploy_pipeline_description" {
 }
 
 variable "deploy_stage_deploy_stage_type" {
-  default = "OKE_DEPLOYMENT"
+  default = "OKE_HELM_CHART_DEPLOYMENT"
+}
+
+variable "deploy_stage_helm_release_name" {
+  default = "node-service"
 }
 
 variable "deploy_stage_namespace" {
@@ -73,7 +77,7 @@ variable "deploy_stage_namespace" {
 }
 
 variable "deploy_stage_display_name" {
-  default = "deploy_OKE"
+  default = "Deploy Helm"
 }
 
 variable "deploy_stage_description" {
@@ -81,13 +85,13 @@ variable "deploy_stage_description" {
 }
 
 variable "deploy_pipeline_deploy_pipeline_parameters_items_default_value" {
-  default = "defaultValue"
+  default = ""
 }
 
 variable "deploy_pipeline_deploy_pipeline_parameters_items_description" {
-  default = "description"
+  default = ""
 }
 
 variable "deploy_pipeline_deploy_pipeline_parameters_items_name" {
-  default = "name"
+  default = "BUILDRUN_HASH"
 }

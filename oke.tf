@@ -33,7 +33,7 @@ module "oci-oke" {
 }
 
 resource "oci_identity_compartment" "oke_compartment" {
-  compartment_id = var.compartment_id
+  compartment_id = var.compartment_ocid
   name           = "${local.app_name_normalized}-${random_string.deploy_id.result}"
   description    = "${var.app_name} ${var.oke_compartment_description} (Deployment ${random_string.deploy_id.result})"
   enable_delete  = true
@@ -41,7 +41,7 @@ resource "oci_identity_compartment" "oke_compartment" {
   count = var.create_new_compartment_for_oke ? 1 : 0
 }
 locals {
-  oke_compartment_id = var.compartment_id
+  oke_compartment_id = var.compartment_ocid
 }
 
 # Local kubeconfig for when using Terraform locally. Not used by Oracle Resource Manager

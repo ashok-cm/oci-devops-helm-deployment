@@ -6,6 +6,14 @@ resource "oci_artifacts_container_repository" "test_container_repository" {
   is_public = var.container_repository_is_public
 }
 
+resource "oci_artifacts_container_repository" "test_container_repository_helm" {
+  #Required
+  compartment_id = var.compartment_ocid
+  display_name   = "devops-helm-${random_id.tag.hex}"
+  #Optional
+  is_public = var.container_repository_is_public
+}
+
 resource "oci_devops_deploy_artifact" "test_deploy_artifact" {
 
   #Required

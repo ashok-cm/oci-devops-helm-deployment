@@ -31,8 +31,17 @@ resource "oci_devops_build_pipeline" "test_build_pipeline" {
             name = "HELM_REPO_URL"
 
             #Optional
-            default_value = var.helm_image_url
-            description = "User to push helm packages."
+            default_value = "oci://${local.ocir_docker_repository}/${local.ocir_namespace}/${oci_artifacts_container_repository.test_container_repository_helm.display_name}"
+            description = "Helm repo URL to push helm packages."
+        }
+
+        items {
+            #Required
+            name = "HELM_REPO"
+
+            #Optional
+            default_value = "${local.ocir_docker_repository}"
+            description = "Helm repo name"
         }
     }
 }

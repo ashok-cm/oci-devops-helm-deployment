@@ -7,7 +7,7 @@ resource "random_id" "tag" {
 
 resource "oci_identity_tag_namespace" "ArchitectureCenterTagNamespace" {
   provider       = oci.home_region
-  compartment_id = var.compartment_id
+  compartment_id = var.compartment_ocid
   description    = "ArchitectureCenterTagNamespace"
   name           = "ArchitectureCenter\\devops_oke-${random_id.tag.hex}"
 

@@ -30,6 +30,7 @@ resource "oci_devops_build_pipeline_stage" "test_build_pipeline_stage" {
   build_spec_file = var.build_pipeline_stage_build_spec_file
 
   display_name                       = var.build_pipeline_stage_display_name
+  description                        = var.build_pipeline_stage_description
   image                              = var.build_pipeline_stage_image
   stage_execution_timeout_in_seconds = var.build_pipeline_stage_stage_execution_timeout_in_seconds
   wait_criteria {

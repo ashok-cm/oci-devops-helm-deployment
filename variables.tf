@@ -6,7 +6,6 @@ variable "user_ocid" {}
 variable "fingerprint" {}
 variable "private_key_path" {}
 variable "region" {}
-variable "compartment_id" {}
 variable "compartment_ocid" {}
 variable "oci_username" {}
 variable "oci_user_authtoken" {}
@@ -78,11 +77,15 @@ variable "build_pipeline_stage_build_source_collection_items_name" {
 }
 
 variable "build_pipeline_stage_build_spec_file" {
-  default = ""
+  default = "build_spec.yaml"
 }
 
 variable "build_pipeline_stage_display_name" {
-  default = "build-pipeline"
+  default = "Build Application"
+}
+
+variable "build_pipeline_stage_description" {
+  default = "Build sample NodeJS application"
 }
 
 variable "build_pipeline_stage_image" {
@@ -109,10 +112,12 @@ variable "build_pipeline_stage_deliver_artifact_collection_items_artifact_name" 
   default = "output01"
 }
 
-variable "helm_image_url" {}
-
 variable "deliver_artifact_stage_display_name" {
-  default = "deliver-artifact"
+  default = "Upload Artifacts"
+}
+
+variable "deliver_artifact_stage_description" {
+  default = "Upload Artifacts"
 }
 
 variable "container_repository_is_public" {
@@ -129,4 +134,16 @@ variable "deploy_artifact_deploy_artifact_source_deploy_artifact_source_type" {
 
 variable "deploy_artifact_deploy_artifact_type" {
   default = "DOCKER_IMAGE"
+}
+
+variable "deploy_helm_chart_name" {
+  default = "node-service"
+}
+
+variable "build_pipeline_stage_deploy_stage_type" {
+  default = "TRIGGER_DEPLOYMENT_PIPELINE"
+}
+
+variable "build_pipeline_stage_is_pass_all_parameters_enabled" {
+  default = true
 }
