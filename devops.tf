@@ -1,3 +1,6 @@
+## Copyright (c) 2022, Oracle and/or its affiliates.
+## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
+
 resource "oci_logging_log_group" "test_log_group" {
   compartment_id = var.compartment_ocid
   display_name   = "${local.app_name_normalized}_${random_string.deploy_id.result}_log_group"
@@ -107,6 +110,7 @@ resource "oci_devops_deploy_artifact" "test_deploy_helm_artifact" {
     chart_url = "oci://${local.ocir_docker_repository}/${local.ocir_namespace}/${oci_artifacts_container_repository.test_container_repository_helm.display_name}/${var.deploy_helm_chart_name}"
     deploy_artifact_version = "0.1.0-$${BUILDRUN_HASH}"
   }
+  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "oci_devops_deploy_stage" "test_helm_deploy_stage" {
@@ -122,10 +126,11 @@ resource "oci_devops_deploy_stage" "test_helm_deploy_stage" {
 
   description  = var.deploy_stage_description
   display_name = var.deploy_stage_display_name
+  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 
   deploy_stage_type = var.deploy_stage_deploy_stage_type
   release_name = var.deploy_stage_helm_release_name
   values_artifact_ids = [oci_devops_deploy_artifact.test_deploy_values_yaml_artifact.id]
   helm_chart_deploy_artifact_id = oci_devops_deploy_artifact.test_deploy_helm_artifact.id
-  oke_cluster_deploy_environment_id       = oci_devops_deploy_environment.test_environment.id
+  oke_cluster_deploy_environment_id = oci_devops_deploy_environment.test_environment.id
 }

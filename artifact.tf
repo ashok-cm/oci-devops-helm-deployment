@@ -1,3 +1,6 @@
+## Copyright (c) 2022, Oracle and/or its affiliates.
+## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
+
 resource "oci_artifacts_container_repository" "test_container_repository" {
   #Required
   compartment_id = var.compartment_ocid
@@ -34,4 +37,5 @@ resource "oci_devops_deploy_artifact" "test_deploy_artifact" {
 
   #Optional
   display_name = "${oci_artifacts_container_repository.test_container_repository.display_name}"
+  defined_tags    = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }

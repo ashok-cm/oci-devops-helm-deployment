@@ -1,12 +1,12 @@
-## Copyright (c) 2021, Oracle and/or its affiliates.
+## Copyright (c) 2022, Oracle and/or its affiliates.
 ## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
-
 
 resource "oci_identity_dynamic_group" "devops_pipln_dg" {
   name           = "${local.app_name_normalized}-devops-pipln-dg-${random_string.deploy_id.result}"
   description    = "${var.app_name} DevOps Pipeline Dynamic Group"
   compartment_id = var.tenancy_ocid
   matching_rule  = "All {resource.type = 'devopsdeploypipeline', resource.compartment.id = '${var.compartment_ocid}'}"
+  defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 
   provider = oci.home_region
 
@@ -17,6 +17,7 @@ resource "oci_identity_policy" "devops_compartment_policies" {
   description    = "${var.app_name} DevOps Compartment Policies"
   compartment_id = var.compartment_ocid
   statements     = local.devops_compartment_statements
+  defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 
   depends_on = [oci_identity_dynamic_group.devops_pipln_dg]
 

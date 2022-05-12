@@ -1,12 +1,12 @@
-## Copyright (c) 2021, Oracle and/or its affiliates.
+## Copyright (c) 2022, Oracle and/or its affiliates.
 ## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
-
 
 resource "oci_identity_dynamic_group" "oke_nodes_dg" {
   name           = "${local.app_name_normalized}-oke-cluster-dg-${random_string.deploy_id.result}"
   description    = "${var.app_name} Cluster Dynamic Group"
   compartment_id = var.tenancy_ocid
   matching_rule  = "ANY {ALL {instance.compartment.id = '${local.oke_compartment_id}'},ALL {resource.type = 'cluster', resource.compartment.id = '${local.oke_compartment_id}'}}"
+  defined_tags  = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 
   provider = oci.home_region
 
@@ -19,6 +19,7 @@ resource "oci_identity_policy" "oke_compartment_policies" {
   statements     = local.oke_compartment_statements
 
   depends_on = [oci_identity_dynamic_group.oke_nodes_dg]
+  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 
   provider = oci.home_region
 
@@ -29,6 +30,7 @@ resource "oci_identity_policy" "kms_compartment_policies" {
   description    = "${var.app_name} KMS Compartment Policies"
   compartment_id = local.oke_compartment_id
   statements     = local.kms_compartment_statements
+  defined_tags   = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 
   depends_on = [oci_identity_dynamic_group.oke_nodes_dg]
 
@@ -44,6 +46,7 @@ resource "oci_identity_policy" "oke_tenancy_policies" {
   statements     = local.oke_tenancy_statements
 
   depends_on = [oci_identity_dynamic_group.oke_nodes_dg]
+  defined_tags = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 
   provider = oci.home_region
 

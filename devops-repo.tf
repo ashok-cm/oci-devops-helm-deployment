@@ -1,3 +1,5 @@
+## Copyright (c) 2022, Oracle and/or its affiliates.
+## All rights reserved. The Universal Permissive License (UPL), Version 1.0 as shown at http://oss.oracle.com/licenses/upl
 
 resource "oci_devops_repository" "test_repository" {
   #Required
@@ -9,6 +11,7 @@ resource "oci_devops_repository" "test_repository" {
   description    = var.repository_description
 
   repository_type = var.repository_repository_type
+  defined_tags    = { "${oci_identity_tag_namespace.ArchitectureCenterTagNamespace.name}.${oci_identity_tag.ArchitectureCenterTag.name}" = var.release }
 }
 
 resource "null_resource" "clonerepo" {
