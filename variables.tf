@@ -109,7 +109,7 @@ variable "build_pipeline_stage_deliver_artifact_stage_type" {
 }
 
 variable "build_pipeline_stage_deliver_artifact_collection_items_artifact_name" {
-  default = "output01"
+  default = "APPLICATION_DOCKER_IMAGE"
 }
 
 variable "deliver_artifact_stage_display_name" {
